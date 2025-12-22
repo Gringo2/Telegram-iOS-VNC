@@ -5,7 +5,7 @@ workflows:
 
     environment:
       vars:
-        APP_URL: https://github.com/Gringo2/Telegram-iOS/releases/download/build-31954/Telegram.app.zip
+        APP_URL: https://github.com/Gringo2/Telegram-iOS/releases/download/build-31966/Telegram.app.zip
       xcode: latest
 
     scripts:
