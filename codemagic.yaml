@@ -24,6 +24,17 @@ workflows:
       - name: Install and launch Telegram
         script: |
           xcrun simctl install booted Telegram.app
-          BUNDLE_ID=$(defaults read Telegram.app/Info.plist CFBundleIdentifier)
+      
+          INFO_PLIST="Telegram.app/Contents/Info.plist"
+      
+          if [ ! -f "$INFO_PLIST" ]; then
+            echo "ERROR: Info.plist not found"
+            find Telegram.app -maxdepth 3 -name Info.plist
+            exit 1
+          fi
+      
+          BUNDLE_ID=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$INFO_PLIST")
           echo "Bundle ID: $BUNDLE_ID"
+      
           xcrun simctl launch booted "$BUNDLE_ID"
+
