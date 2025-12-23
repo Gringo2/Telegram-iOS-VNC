@@ -25,11 +25,10 @@ workflows:
         script: |
           xcrun simctl install booted Telegram.app
       
-          INFO_PLIST="Telegram.app/Contents/Info.plist"
+          INFO_PLIST="Telegram.app/Info.plist"
       
           if [ ! -f "$INFO_PLIST" ]; then
             echo "ERROR: Info.plist not found"
-            find Telegram.app -maxdepth 3 -name Info.plist
             exit 1
           fi
       
@@ -37,4 +36,8 @@ workflows:
           echo "Bundle ID: $BUNDLE_ID"
       
           xcrun simctl launch booted "$BUNDLE_ID"
-
+      
+                echo "Bundle ID: $BUNDLE_ID"
+            
+                xcrun simctl launch booted "$BUNDLE_ID"
+      
