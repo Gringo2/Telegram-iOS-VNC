@@ -1,6 +1,6 @@
 workflows:
-  telegram-simulator-preview:
-    name: Telegram Simulator (VNC)
+  telegram-ui-only:
+    name: Telegram UI-Only Simulator
     max_build_duration: 120
 
     environment:
@@ -9,35 +9,39 @@ workflows:
       xcode: latest
 
     scripts:
-      - name: Download Telegram simulator build
+      - name: Download Telegram UI-Only build
         script: |
+          echo "Downloading Telegram UI-Only build..."
           curl -L "$APP_URL" -o Telegram.app.zip
           unzip Telegram.app.zip
+          ls -l Telegram.app
 
       - name: Boot iOS Simulator
         script: |
+          echo "Shutting down all simulators..."
           xcrun simctl shutdown all || true
+
+          echo "Booting iPhone 15 simulator..."
           xcrun simctl boot "iPhone 15"
           open -a Simulator
-          sleep 10
 
-      - name: Install and launch Telegram
+          echo "Waiting for simulator to fully boot..."
+          until xcrun simctl list | grep -q "Booted"; do
+              sleep 5
+          done
+          echo "Simulator is ready."
+
+      - name: Install and launch Telegram UI-Only
         script: |
-          xcrun simctl install booted Telegram.app
-      
+          # Optional safety check
           INFO_PLIST="Telegram.app/Info.plist"
-      
           if [ ! -f "$INFO_PLIST" ]; then
-            echo "ERROR: Info.plist not found"
+            echo "ERROR: Info.plist not found at $INFO_PLIST"
             exit 1
           fi
-      
-          BUNDLE_ID=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$INFO_PLIST")
-          echo "Bundle ID: $BUNDLE_ID"
-      
-          xcrun simctl launch booted "$BUNDLE_ID"
-      
-                echo "Bundle ID: $BUNDLE_ID"
-            
-                xcrun simctl launch booted "$BUNDLE_ID"
-      
+
+          echo "Installing Telegram UI-Only build..."
+          xcrun simctl install booted Telegram.app
+
+          echo "Launching Telegram UI-Only..."
+          xcrun simctl launch booted org.telegram.Telegram
